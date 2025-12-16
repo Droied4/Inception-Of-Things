@@ -5,8 +5,6 @@ Vagrant.configure("2") do |config|
 
   config.vm.box = "ubuntu/jammy64"
   
-  config.vm.provision "shell", path: "server/setup.sh"
-
   config.vm.provider "virtualbox" do |vb|
     vb.memory = 1024
     vb.cpus = 1
@@ -18,7 +16,7 @@ Vagrant.configure("2") do |config|
     control.vm.provider "virtualbox" do |vb|
       vb.name = "IoT1"
     end
-    # control.vm.provision
+    control.vm.provision "shell", path: "server/setup.sh", args: "controller"
   end
 
   config.vm.define "deordoneSW" do |control|
@@ -27,6 +25,6 @@ Vagrant.configure("2") do |config|
     control.vm.provider "virtualbox" do |vb|
       vb.name = "IoT2"
     end
-    # control.vm.provision
+    control.vm.provision "shell", path: "server/setup.sh", args: "agent"
   end
 end
