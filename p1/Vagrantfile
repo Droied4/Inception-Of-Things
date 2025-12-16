@@ -19,12 +19,12 @@ Vagrant.configure("2") do |config|
     control.vm.provision "shell", path: "server/setup.sh", args: "controller"
   end
 
-  config.vm.define "deordoneSW" do |control|
-    control.vm.hostname = "deordoneSW"
-    control.vm.network "private_network", ip: "192.168.56.111"
-    control.vm.provider "virtualbox" do |vb|
+  config.vm.define "deordoneSW" do |agent|
+    agent.vm.hostname = "deordoneSW"
+    agent.vm.network "private_network", ip: "192.168.56.111"
+    agent.vm.provider "virtualbox" do |vb|
       vb.name = "IoT2"
     end
-    control.vm.provision "shell", path: "server/setup.sh", args: "agent"
+    agent.vm.provision "shell", path: "server/setup.sh", args: "agent"
   end
 end
