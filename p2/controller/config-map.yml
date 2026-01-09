@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app1-html
+data:
+  index.html: |
+    <html>
+      <body>
+        <h1>app1 epico</h1>
+      </body>
+    </html>
