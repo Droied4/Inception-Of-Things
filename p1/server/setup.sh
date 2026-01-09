@@ -10,9 +10,6 @@ k3_installation()
 	sudo apt-get update
 	sudo apt-get install -y curl 
 	ufw disable
-
-	echo "alias k='kubectl'" >> ~/.bashrc
-	source ~/.bashrc
 }
 
 install_controller()
@@ -30,7 +27,6 @@ install_controller()
 
 	echo "Saving token to shared folder..."
 	sudo cat /var/lib/rancher/k3s/server/node-token > "$TOKEN_FILE"
-	alias k=kubectl
 }
 
 install_agent()
