@@ -8,8 +8,8 @@ k3_installation()
 	sudo apt-get install -y curl 
 	ufw disable
 
-	echo "alias k='kubectl'" >> ~/.bashrc
-	source ~/.bashrc
+	echo "alias k='kubectl'" >> .bashrc
+	source .bashrc
 }
 
 install_controller()
