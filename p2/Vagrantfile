@@ -16,9 +16,9 @@ Vagrant.configure("2") do |config|
     control.vm.provider "virtualbox" do |vb|
       vb.name = "IoT1"
     end
-    control.vm.provision "file", source: "./controller/config-map.yml", destination: "/home/vagrant/"
-    control.vm.provision "file", source: "./controller/services.yml", destination: "/home/vagrant/"
-    control.vm.provision "file", source: "./controller/deployments.yml", destination: "/home/vagrant/"
+    control.vm.provision "file", source: "./manifest/config-map.yml", destination: "/home/vagrant/"
+    control.vm.provision "file", source: "./manifest/services.yml", destination: "/home/vagrant/"
+    control.vm.provision "file", source: "./manifest/deployments.yml", destination: "/home/vagrant/"
     control.vm.provision "shell", path: "server/setup.sh"
   end
 end
