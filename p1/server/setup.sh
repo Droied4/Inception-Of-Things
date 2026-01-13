@@ -4,7 +4,7 @@ set -e
 CONTROLLER_IP="192.168.56.110"
 TOKEN_FILE="/vagrant/k3s_token"
 
-k3_installation()
+install_deps()
 {
 	echo "Installing dependencies..."
 	sudo apt-get update
@@ -51,7 +51,7 @@ install_agent()
 main()
 {
 	ROLE="$1"
-	k3_installation
+	install_deps
 	if [ "$ROLE" = "controller" ]; then
 		install_controller
 	elif [ "$ROLE" = "agent" ]; then
