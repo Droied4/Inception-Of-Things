@@ -19,6 +19,7 @@ Vagrant.configure("2") do |config|
     control.vm.provision "file", source: "./manifest/config-map.yml", destination: "/home/vagrant/"
     control.vm.provision "file", source: "./manifest/services.yml", destination: "/home/vagrant/"
     control.vm.provision "file", source: "./manifest/deployments.yml", destination: "/home/vagrant/"
+    control.vm.provision "file", source: "./manifest/ingress.yml", destination: "/home/vagrant/"
     control.vm.provision "shell", path: "server/setup.sh"
   end
 end

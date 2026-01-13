@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: nginx-service
+  name: app1-service
   labels: 
     app: nginx
 spec:
@@ -12,4 +12,35 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 80
-      nodePort: 30080
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: app2-service
+  labels: 
+    app: nginx
+spec:
+  selector:
+    app: app2 
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: app3-service
+  labels: 
+    app: nginx
+spec:
+  selector:
+    app: app3 
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80

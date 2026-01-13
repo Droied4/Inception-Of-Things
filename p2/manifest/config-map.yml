@@ -9,3 +9,31 @@ data:
         <h1>app1 epico</h1>
       </body>
     </html>
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app2-html
+data:
+  index.html: |
+    <html>
+      <body>
+        <h1>app2 epico</h1>
+      </body>
+    </html>
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app3-html
+data:
+  index.html: |
+    <html>
+      <body>
+        <h1>app3 epico</h1>
+      </body>
+    </html>
