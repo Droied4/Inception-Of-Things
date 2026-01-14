@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e 
 
-k3_installation()
+install_deps()
 {
 	echo "Installing dependencies..."
 	sudo apt-get update
@@ -21,10 +21,19 @@ install_controller()
 		--write-kubeconfig-mode 644
 }
 
+init_manifests()
+{
+	kubectl apply -f /home/vagrant/config-map.yml
+	kubectl apply -f /home/vagrant/services.yml
+	kubectl apply -f /home/vagrant/ingress.yml
+	kubectl apply -f /home/vagrant/deployments.yml
+}
+
 main()
 {
-	k3_installation
+	install_deps	
 	install_controller
+	init_manifests
 }
 
 main "$@"
