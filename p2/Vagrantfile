@@ -16,10 +16,10 @@ Vagrant.configure("2") do |config|
     control.vm.provider "virtualbox" do |vb|
       vb.name = "IoT1"
     end
-    control.vm.provision "file", source: "./manifest/config-map.yml", destination: "/home/vagrant/"
-    control.vm.provision "file", source: "./manifest/services.yml", destination: "/home/vagrant/"
-    control.vm.provision "file", source: "./manifest/deployments.yml", destination: "/home/vagrant/"
-    control.vm.provision "file", source: "./manifest/ingress.yml", destination: "/home/vagrant/"
-    control.vm.provision "shell", path: "server/setup.sh"
+    control.vm.provision "file", source: "./conf/config-map.yml", destination: "/home/vagrant/"
+    control.vm.provision "file", source: "./conf/services.yml", destination: "/home/vagrant/"
+    control.vm.provision "file", source: "./conf/deployments.yml", destination: "/home/vagrant/"
+    control.vm.provision "file", source: "./conf/ingress.yml", destination: "/home/vagrant/"
+    control.vm.provision "shell", path: "script/setup.sh"
   end
 end
