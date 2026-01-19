@@ -38,7 +38,7 @@ create_cluster()
 	kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
 	kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
-	#hay un timeout aqui porque se tarda demasiado no se si por la red o falta de recursos y en 42 dudo que funcione
+	#hay un timeout aqui porque se tarda demasiado no se si por la red o falta de recursos.
 	kubectl -n argocd wait --for=condition=available deploy --all 
 	kubectl -n argocd wait --for=condition=Ready pod --all 
 	nohup kubectl port-forward svc/argocd-server -n argocd --address 0.0.0.0 8080:443 > /dev/null &
@@ -54,9 +54,12 @@ create_application()
 	kubectl create namespace dev
 #	Conseguir contrasena del usuario admin
 	PASS=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo)
-	export admin_pass=$PASS
+	export PASS=$PASS
 	argocd login localhost:8080 --username admin --password "$PASS" --insecure
 	argocd repo add $REPO
+	kubectl apply -n dev -f https://raw.githubusercontent.com/Droied4/deordone-argoCD/main/install.yml
+	kubectl apply -f ../conf/argo-conf.yml 
+	kubectl apply -f ../conf/ingress.yml 
 }
 
 main()
