@@ -5,7 +5,7 @@ metadata:
   namespace: argocd
   annotations:
     ingress.kubernetes.io/ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTP" # Force HTTP backend protocol since ArgoCD server is in insecure mode
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
 spec:
   rules:
   - host: argocd.localhost
