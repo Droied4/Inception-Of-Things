@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 install_deps()
 {
 	echo "Installing dependencies..."
@@ -22,9 +24,9 @@ config_deps()
 	sudo usermod -aG docker $USER
 	newgrp docker
 	
-	mkdir -p /home/vagrant/.kube
+	#mkdir -p /home/vagrant/.kube
 
-	echo "alias k='kubectl'" >> .bashrc
+	echo "alias k='kubectl'" >> ~.bashrc
 	source .bashrc
 }
 
