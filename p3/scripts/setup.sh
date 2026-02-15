@@ -75,7 +75,7 @@ create_cluster()
 		chown -R $USER:$USER $HOME/.kube
 	fi
 
-	if ! k get namespaces | grep -qw "$namespace_name";
+	if ! kubectl get namespaces | grep -qw "$namespace_name";
 	then
 		echo "Creating namespace for $namespace_name"
 		kubectl create namespace "$namespace_name"
@@ -85,8 +85,9 @@ create_cluster()
 
 	kubectl -n argocd wait --for=condition=available deploy --all 
 	kubectl -n argocd wait --for=condition=Ready pod --all 
+	echo "PODS AVAILABLE!"
 
-	if ! grep "kubectl port-forward svc/argocd-server -n --address 0.0.0.0 8080:443"; 
+	if ! ps aux | grep "kubectl port-forward svc/argocd-server -n --address 0.0.0.0 8080:443"; 
 	then
 		echo "running proccess port-forward"
 		nohup kubectl port-forward svc/argocd-server -n "$namespace_name" --address 0.0.0.0 8080:443 > /dev/null &
@@ -102,18 +103,23 @@ create_application()
 	namespace_name=dev
 
 	echo "Creating application..."
-	if ! k get namespaces | grep -qw "$namespace_name";
+	if ! kubectl get namespaces | grep -qw "$namespace_name";
 	then
 		kubectl create namespace "$namespace_name"
 		#Conseguir contrasena del usuario admin
 		PASS=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo)
-		export PASS=$PASS
+		#antes funcaba ahora ya no por que? ni pta idea
 		argocd login localhost:8080 --username admin --password "$PASS" --insecure
 		argocd repo add $REPO
 	fi
 	kubectl apply -n "$namespace_name" -f https://raw.githubusercontent.com/Droied4/deordone-argoCD/main/install.yml
-	kubectl apply -f ../conf/argo-conf.yml 
-	kubectl apply -f ../conf/ingress.yml 
+	
+	kubectl apply -f $HOME/iot/p3/conf/argo-conf.yml 
+	kubectl apply -f $HOME/iot/p3/conf/ingress.yml 
+	#no funciona la focking contrasena
+	#kubectl -n argocd patch secret argocd-secret -p '{"stringData": {"admin.password": "Macarrones", "admin.passwordMtime": "'$(date +%FT%T%Z)'"}}'
+	#kubectl rollout restart deployment argocd-server -n argocd
+	#kubectl get pods -n argocd
 }
 
 main()
