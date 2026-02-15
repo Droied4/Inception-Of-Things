@@ -87,12 +87,13 @@ create_cluster()
 	kubectl -n argocd wait --for=condition=Ready pod --all 
 	echo "PODS AVAILABLE!"
 
-	if ! ps aux | grep "kubectl port-forward svc/argocd-server -n --address 0.0.0.0 8080:443"; 
+	if ! ps aux | grep -qw "kubectl port-forward svc/argocd-server -n --address 0.0.0.0 8080:443"; 
 	then
 		echo "running proccess port-forward"
 		nohup kubectl port-forward svc/argocd-server -n "$namespace_name" --address 0.0.0.0 8080:443 > /dev/null &
 	fi
 	until curl -k https://localhost:8080/healthz 2>/dev/null; do
+		echo "waiting for connection to localhost:8080"
   		sleep 2
 	done
 }
@@ -108,7 +109,6 @@ create_application()
 		kubectl create namespace "$namespace_name"
 		#Conseguir contrasena del usuario admin
 		PASS=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo)
-		#antes funcaba ahora ya no por que? ni pta idea
 		argocd login localhost:8080 --username admin --password "$PASS" --insecure
 		argocd repo add $REPO
 	fi
@@ -116,10 +116,7 @@ create_application()
 	
 	kubectl apply -f $HOME/iot/p3/conf/argo-conf.yml 
 	kubectl apply -f $HOME/iot/p3/conf/ingress.yml 
-	#no funciona la focking contrasena
-	#kubectl -n argocd patch secret argocd-secret -p '{"stringData": {"admin.password": "Macarrones", "admin.passwordMtime": "'$(date +%FT%T%Z)'"}}'
-	#kubectl rollout restart deployment argocd-server -n argocd
-	#kubectl get pods -n argocd
+	echo "try $PASS"
 }
 
 main()
