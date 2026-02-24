@@ -1,0 +1,14 @@
+global:
+  hosts:
+    domain: example.com
+  ingress:
+    configureCertmanager: false
+
+certmanager:
+  install: false
+
+prometheus:
+  install: false
+
+gitlab-runner:
+  install: false
