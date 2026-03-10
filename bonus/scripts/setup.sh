@@ -52,7 +52,7 @@ install_deps()
 		echo "Installing helm..."
 	curl -fsSL https://packages.buildkite.com/helm-linux/helm-debian/gpgkey | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
 	echo "deb [signed-by=/usr/share/keyrings/helm.gpg] https://packages.buildkite.com/helm-linux/helm-debian/any/ any main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
-	sudo apt-get install helm
+	sudo apt install helm
 	fi
 }
 
@@ -107,18 +107,16 @@ create_ns_gitlab()
 	helm repo add gitlab https://charts.gitlab.io/
 	helm repo update
 	
-helm install gitlab gitlab/gitlab \
+helm upgrade --install gitlab gitlab/gitlab \
   --namespace gitlab \
-  -f #path to values.yml
+  -f $HOME/iot/bonus/conf/values.yml \
+  --timeout 20m
 
 kubectl get pods -n gitlab
 
 kubectl get secret gitlab-gitlab-initial-root-password \
   -n gitlab \
   -o jsonpath="{.data.password}" | base64 --decode ; echo
-
-#user root
-
 }
 
 create_ns_argocd()
@@ -132,16 +130,13 @@ create_ns_argocd()
 helm repo add argo https://argoproj.github.io/argo-helm
 helm repo update
 
-helm install argocd argo/argo-cd \
+helm upgrade --install argocd argo/argo-cd \
   --namespace argocd
 
-	helm install gitlab gitlab/gitlab \
-
-		kubectl get secret argocd-initial-admin-secret \
-  -n argocd \
-  -o jsonpath="{.data.password}" | base64 --decode ; echo
+		#kubectl get secret argocd-initial-admin-secret \
+  #-n argocd \
+  #-o jsonpath="{.data.password}" | base64 --decode ; echo
 		
-kubectl port-forward svc/argocd-server -n argocd 8080:443
 
 }
 
@@ -168,12 +163,17 @@ create_ns_dev()
 
 main()
 {
+	if [ "$1" = "run" ]; then	
+		kubectl port-forward svc/argocd-server -n argocd 8080:443
+	else
 	install_deps	
 	config_deps
 	create_cluster	
-	#create_ns_argocd
-	#create_ns_gitlab
+	create_ns_gitlab
+	create_ns_argocd
 	create_ns_dev
+
+	fi
 }
 
 main "$@"

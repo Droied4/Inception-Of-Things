@@ -1,14 +1,46 @@
 global:
   hosts:
-    domain: example.com
+    domain: local
+    externalIP: 127.0.0.1
+  edition: ce
   ingress:
     configureCertmanager: false
+    class: nginx
+    tls:
+      enabled: false
 
 certmanager:
-  install: false
+  enabled: false
 
 prometheus:
-  install: false
+  enabled: false
+
+grafana:
+  enabled: false
 
 gitlab-runner:
   install: false
+
+registry:
+  enabled: false
+
+nginx-ingress:
+  enabled: false
+
+gitlab:
+  webservice:
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+  sidekiq:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 300m
+        memory: 512Mi
