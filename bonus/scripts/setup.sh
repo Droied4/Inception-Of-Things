@@ -5,7 +5,7 @@ set -e
 install_deps()
 {
 	echo "Installing dependencies..."
-	sudo apt-get update
+	#sudo apt-get update
 
 	if ! command -v curl > /dev/null;
 	then	
@@ -17,7 +17,7 @@ install_deps()
 		echo "Installing Gpg..."
 		sudo apt-get install -y gpg 
 	fi
-	if ! command -v apt-transport-https > /dev/null;
+	if ! dpkg -l grep apt-transport-https > /dev/null;
 	then
 		echo "Installing apt-transport-https..."
 		sudo apt-get install -y apt-transport-https 
@@ -50,9 +50,9 @@ install_deps()
 	if ! command -v helm > /dev/null;
 	then
 		echo "Installing helm..."
-	curl -fsSL https://packages.buildkite.com/helm-linux/helm-debian/gpgkey | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
-	echo "deb [signed-by=/usr/share/keyrings/helm.gpg] https://packages.buildkite.com/helm-linux/helm-debian/any/ any main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
-	sudo apt install helm
+		curl -fsSL https://packages.buildkite.com/helm-linux/helm-debian/gpgkey | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
+		echo "deb [signed-by=/usr/share/keyrings/helm.gpg] https://packages.buildkite.com/helm-linux/helm-debian/any/ any main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+		sudo apt install helm
 	fi
 }
 
@@ -102,21 +102,21 @@ create_ns_gitlab()
 	then
 		echo "Creating namespace for $namespace_name"
 		kubectl create namespace "$namespace_name"
+
+		helm repo add gitlab https://charts.gitlab.io/
+		helm repo update
+
+		helm upgrade --install gitlab gitlab/gitlab \
+			--namespace gitlab \
+			-f $HOME/iot/bonus/conf/values.yml \
+			--timeout 20m
+
+		kubectl get pods -n gitlab
+
+		kubectl get secret gitlab-gitlab-initial-root-password \
+			-n gitlab \
+			-o jsonpath="{.data.password}" | base64 --decode ; echo
 	fi
-
-	helm repo add gitlab https://charts.gitlab.io/
-	helm repo update
-	
-helm upgrade --install gitlab gitlab/gitlab \
-  --namespace gitlab \
-  -f $HOME/iot/bonus/conf/values.yml \
-  --timeout 20m
-
-kubectl get pods -n gitlab
-
-kubectl get secret gitlab-gitlab-initial-root-password \
-  -n gitlab \
-  -o jsonpath="{.data.password}" | base64 --decode ; echo
 }
 
 create_ns_argocd()
@@ -125,19 +125,18 @@ create_ns_argocd()
 	then
 		echo "Creating namespace for $namespace_name"
 		kubectl create namespace "$namespace_name"
-	fi
 
-helm repo add argo https://argoproj.github.io/argo-helm
-helm repo update
+		helm repo add argo https://argoproj.github.io/argo-helm
+		helm repo update
 
-helm upgrade --install argocd argo/argo-cd \
-  --namespace argocd
+		helm upgrade --install argocd argo/argo-cd \
+			--namespace argocd
 
 		#kubectl get secret argocd-initial-admin-secret \
-  #-n argocd \
-  #-o jsonpath="{.data.password}" | base64 --decode ; echo
-		
+		#-n argocd \
+		#-o jsonpath="{.data.password}" | base64 --decode ; echo
 
+	fi
 }
 
 create_ns_dev()
@@ -164,7 +163,7 @@ create_ns_dev()
 main()
 {
 	if [ "$1" = "run" ]; then	
-		kubectl port-forward svc/argocd-server -n argocd 8080:443
+		kubectl port-forward svc/argocd-server -n argocd 8080:443 &
 	else
 	install_deps	
 	config_deps
