@@ -40,18 +40,12 @@ install_deps()
 		sudo chmod +x $HOME/kubectl
 		sudo mv $HOME/kubectl /usr/local/bin
 	fi
-	if ! command -v argocd > /dev/null; 
-	then
-		echo "Installing argocd..."
-		curl -sSL -o $HOME/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
-		sudo chmod +x $HOME/argocd 
-		sudo mv $HOME/argocd /usr/local/bin/
-	fi
 	if ! command -v helm > /dev/null;
 	then
 		echo "Installing helm..."
 		curl -fsSL https://packages.buildkite.com/helm-linux/helm-debian/gpgkey | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
 		echo "deb [signed-by=/usr/share/keyrings/helm.gpg] https://packages.buildkite.com/helm-linux/helm-debian/any/ any main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+		sudo apt update
 		sudo apt install helm
 	fi
 }
@@ -121,6 +115,7 @@ create_ns_gitlab()
 
 create_ns_argocd()
 {
+	namespace_name=argocd
 	if ! kubectl get namespaces | grep -qw "$namespace_name";
 	then
 		echo "Creating namespace for $namespace_name"
@@ -149,21 +144,23 @@ create_ns_dev()
 	then
 		kubectl create namespace "$namespace_name"
 		#Conseguir contrasena del usuario admin
+		nohup kubectl port-forward svc/argocd-server -n argocd 8080:443 > /tmp/argocd-portforward.log 2>&1 &
 		PASS=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo)
 		argocd login localhost:8080 --username admin --password "$PASS" --insecure
 		argocd repo add $REPO
 	fi
 	kubectl apply -n "$namespace_name" -f https://raw.githubusercontent.com/Droied4/deordone-argoCD/main/install.yml
 	
-	kubectl apply -f $HOME/iot/p3/conf/argo-conf.yml 
-	kubectl apply -f $HOME/iot/p3/conf/ingress.yml 
+	kubectl apply -f $HOME/iot/bonus/conf/argo-conf.yml 
+	kubectl apply -f $HOME/iot/bonus/conf/ingress.yml 
 	echo "try $PASS"
 }
 
 main()
 {
 	if [ "$1" = "run" ]; then	
-		kubectl port-forward svc/argocd-server -n argocd 8080:443 &
+		kubectl port-forward svc/argocd-server -n argocd 8181:443 &
+		kubectl port-forward svc/gitlab-webservice-default -n gitlab 8443:8181 &
 	else
 	install_deps	
 	config_deps
