@@ -1,13 +1,13 @@
 global:
   hosts:
-    domain: local
-    externalIP: 127.0.0.1
+    domain: nip.io
+    externalIP: 10.0.2.15 
   edition: ce
   ingress:
-    configureCertmanager: false
-    class: nginx
-    tls:
       enabled: false
+
+certmanager-issuer:
+  email: {} 
 
 certmanager:
   enabled: false
@@ -27,20 +27,51 @@ registry:
 nginx-ingress:
   enabled: false
 
+postgresql:
+  sharedBuffers: "32MB"
+  maxConnections: 30
+  resources:
+    limits:
+      memory: 512Mi
+      cpu: 500m
+    requests:
+      memory: 256Mi
+      cpu: 100m
+
+redis:
+  resources:
+    limits:
+      memory: 256Mi
+      cpu: 200m
+    requests:
+      memory: 128Mi
+      cpu: 50m
+
+
 gitlab:
+  kas:
+    enabled: false
+
   webservice:
     resources:
       requests:
-        cpu: 200m
-        memory: 512Mi
-      limits:
         cpu: 500m
+        memory: 1Gi 
+      limits:
+        cpu: 1
         memory: 1Gi
+  puma:
+    threads:
+      min: 1
+      max: 2
+    workerMaxMemory: 500
+
+
   sidekiq:
     resources:
       requests:
-        cpu: 100m
-        memory: 256Mi
-      limits:
         cpu: 300m
-        memory: 512Mi
+        memory: 512Mi 
+      limits:
+        cpu: 1 
+        memory: 1Gi 
