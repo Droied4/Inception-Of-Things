@@ -70,7 +70,6 @@ config_deps()
 create_cluster()
 {
 	cluster_name=mycluster
-	namespace_name=argocd
 	echo "Creating cluster..."
 	if ! k3d cluster list | grep -qw "$cluster_name"; 
 	then
